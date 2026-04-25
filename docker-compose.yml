@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fw-portal-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/fw_portal
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=dev-secret-key-change-in-production
+      - DEBUG=True
+      - ENVIRONMENT=development
+      - AUTH_PROVIDER=azure_ad
+      - AZURE_TENANT_ID=${AZURE_TENANT_ID:-your-tenant-id}
+      - AZURE_CLIENT_ID=${AZURE_CLIENT_ID:-your-client-id}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - backend_data:/app/data
+    networks:
+      - fw-portal-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: fw-portal-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - fw-portal-net
+    restart: unless-stopped
+
+  db:
+    image: postgres:15-alpine
+    container_name: fw-portal-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=fw_portal
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - fw-portal-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    container_name: fw-portal-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - fw-portal-net
+    restart: unless-stopped
+
+  # Optional: pgAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: fw-portal-pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@example.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    networks:
+      - fw-portal-net
+    restart: unless-stopped
+
+networks:
+  fw-portal-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  backend_data:
