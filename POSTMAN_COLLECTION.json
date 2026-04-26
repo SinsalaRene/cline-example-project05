@@ -1,0 +1,456 @@
+{
+    "info": {
+        "name": "Azure Firewall Manager API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Authentication",
+            "item": [
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"email\":\"admin@example.com\",\"password\":\"password\"}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/auth/login",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "login"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Refresh Token",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"refresh_token\":\"{{refreshToken}}\"}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/auth/refresh",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "refresh"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/auth/logout",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "logout"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Firewall Rules",
+            "item": [
+                {
+                    "name": "List Rules",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/firewalls/rules?page=1&per_page=20",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "firewalls",
+                                "rules"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "20"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Rule Details",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/firewalls/rules/{{ruleId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "firewalls",
+                                "rules",
+                                "{{ruleId}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Rule",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"name\":\"Allow HTTP Traffic\",\"rule_collection_name\":\"WebTraffic\",\"action\":\"allow\",\"priority\":100,\"landing_zone\":\"dev\",\"destination_addresses\":[\"*\"],\"destination_ports\":[80,443],\"destination_fqdns\":[\"*.example.com\"]}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/firewalls/rules",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "firewalls",
+                                "rules"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Rule",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"name\":\"Allow HTTP and HTTPS Traffic\",\"rule_collection_name\":\"WebTraffic\",\"action\":\"allow\",\"priority\":100,\"destination_addresses\":[\"*\"],\"destination_ports\":[80,443],\"destination_fqdns\":[\"*.example.com\"],\"notes\":\"Updated to include HTTPS\"}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/firewalls/rules/{{ruleId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "firewalls",
+                                "rules",
+                                "{{ruleId}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Rule",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/firewalls/rules/{{ruleId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "firewalls",
+                                "rules",
+                                "{{ruleId}}"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Approvals",
+            "item": [
+                {
+                    "name": "List Approvals",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/approvals?status=pending",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "approvals"
+                            ],
+                            "query": [
+                                {
+                                    "key": "status",
+                                    "value": "pending"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Approve Rule",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"action\":\"approve\",\"notes\":\"Looks good, ready for deployment\"}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/approvals/{{approvalId}}/action",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "approvals",
+                                "{{approvalId}}",
+                                "action"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Reject Rule",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"action\":\"reject\",\"notes\":\"Priority too low, please increase\"}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/approvals/{{approvalId}}/action",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "approvals",
+                                "{{approvalId}}",
+                                "action"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Statistics",
+            "item": [
+                {
+                    "name": "Dashboard Stats",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/stats/dashboard",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "stats",
+                                "dashboard"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Health Check",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/stats/health",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "stats",
+                                "health"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Export",
+            "item": [
+                {
+                    "name": "Export Rules as CSV",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/v1/export/rules.csv",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "export",
+                                "rules.csv"
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:8000",
+            "type": "string"
+        },
+        {
+            "key": "token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "refreshToken",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "ruleId",
+            "value": "rule-123",
+            "type": "string"
+        },
+        {
+            "key": "approvalId",
+            "value": "approval-123",
+            "type": "string"
+        }
+    ]
+}
