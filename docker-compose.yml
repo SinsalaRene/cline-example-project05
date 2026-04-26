@@ -122,6 +122,36 @@ services:
       - fw-portal-net
     restart: "no"
 
+  # Backend test service
+  test_backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fw-portal-test
+    command: >
+      sh -c "
+        cd /app &&
+        pytest tests/ -v --junitxml=/tmp/test-results.xml &&
+        pytest tests/ --cov=app --cov-report=term-missing
+      "
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/test_fw_portal
+      - SECRET_KEY=test-secret-key-for-testing-only-do-not-use-in-production
+      - ENVIRONMENT=development
+      - REDIS_URL=redis://redis:6379/0
+      - DEBUG=True
+      - AUTH_PROVIDER=local
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - fw-portal-net
+    volumes:
+      - test_results:/tmp/test-results.xml
+    restart: "no"
+
   # Optional: pgAdmin for database management
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -145,3 +175,4 @@ volumes:
   postgres_data:
   redis_data:
   backend_data:
+  test_results:
