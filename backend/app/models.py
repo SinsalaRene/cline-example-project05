@@ -5,6 +5,7 @@ from sqlalchemy import (
     Table, Index, CheckConstraint, UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import UUID as PGUUID, JSONB, ENUM as PGENUM
+from app.config import ApprovalLevel
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
@@ -157,7 +158,7 @@ class FirewallRule(Base):
     status = Column(SaEnum(RuleStatus), nullable=False, default="draft")
     is_active = Column(Boolean, default=True)
 
-    required_approval_level = Column(SaEnum(str), nullable=True)
+    required_approval_level = Column(PGENUM(ApprovalLevel), nullable=True)
     created_by = Column(String(255), nullable=False)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())

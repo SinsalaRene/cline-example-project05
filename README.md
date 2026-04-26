@@ -141,3 +141,21 @@ docker-compose up --build
 - **Auth:** Azure Entra ID (OIDC + OAuth2)
 - **Deployment:** Docker containers on Azure App Service / AKS
 - **Database:** PostgreSQL (Azure Database for PostgreSQL)
+
+## Configuration
+
+Copy `.env.example` to `.env` and configure the values:
+
+```bash
+cp .env.example .env
+```
+
+### Required Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `DATABASE_URL` | PostgreSQL connection string | Yes |
+| `SECRET_KEY` | JWT signing key | Yes |
+| `AZURE_TENANT_ID` | Azure AD Tenant ID (production) | Yes |
+| `AZURE_CLIENT_ID` | Azure AD Client ID (production) | Yes |
+| `AZURE_CLIENT_SECRET` | Azure AD Client Secret (production) | Yes |

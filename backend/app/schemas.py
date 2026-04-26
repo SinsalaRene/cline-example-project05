@@ -3,7 +3,8 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional, List, Any, Dict
 from pydantic import BaseModel, Field, field_validator
-from app.config import Role, RuleAction, RuleStatus, ApprovalStatus, ApprovalLevel, WorkloadType, ResourceCategory
+from app.config import Role, ApprovalLevel
+from app.models import RuleAction, RuleStatus, ApprovalStatus, WorkloadType, ResourceCategory
 
 
 # ─── Authentication ───────────────────────────────────────────────────────────

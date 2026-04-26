@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   backend:
     build:
@@ -9,14 +7,22 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/fw_portal
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/firewall_manager
       - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=dev-secret-key-change-in-production
+      - SECRET_KEY=${JWT_SECRET_KEY:-change-me-in-production}
       - DEBUG=True
       - ENVIRONMENT=development
       - AUTH_PROVIDER=azure_ad
-      - AZURE_TENANT_ID=${AZURE_TENANT_ID:-your-tenant-id}
-      - AZURE_CLIENT_ID=${AZURE_CLIENT_ID:-your-client-id}
+      - AZURE_TENANT_ID=${AZURE_TENANT_ID}
+      - AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
+      - AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET}
+      - DATABASE_SSL_MODE=prefer
+      - DATABASE_POOL_SIZE=10
+      - DATABASE_MAX_OVERFLOW=20
+      - CORS_ORIGINS=http://localhost:4200,http://localhost:3000
+      - RATE_LIMIT_AUTH=5/minute
+      - RATE_LIMIT_DEFAULT=100/minute
+      - REQUEST_ID_HEADER=X-Request-ID
     depends_on:
       db:
         condition: service_healthy
@@ -53,7 +59,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=fw_portal
+      - POSTGRES_DB=firewall_manager
     ports:
       - "5432:5432"
     volumes:
