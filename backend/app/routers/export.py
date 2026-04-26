@@ -1,5 +1,6 @@
 """Data export API routes."""
 import logging
+from datetime import date
 from io import StringIO
 from typing import Optional
 
@@ -22,17 +23,14 @@ def rules_to_csv(rules: list) -> str:
     output.write("id,name,description,landing_zone,rule_collection_name,priority,action,category,status,created_by,created_at\n")
     
     for rule in rules:
-        output.write(f"{rule.id},")
-        output.write(f'"{(rule.name or "").replace('"', '""')}",')
-        output.write(f'"{(rule.description or "").replace('"', '""')}",')
-        output.write(f"{rule.landing_zone},")
-        output.write(f"{rule.rule_collection_name},")
-        output.write(f"{rule.priority},")
-        output.write(f"{rule.action.value if hasattr(rule.action, 'value') else rule.action},")
-        output.write(f"{rule.category.value if hasattr(rule.category, 'value') else rule.category},")
-        output.write(f"{rule.status.value if hasattr(rule.status, 'value') else rule.status},")
-        output.write(f"{rule.created_by},")
-        output.write(f"{rule.created_at}\n")
+        name = (rule.name or "").replace('"', '""')
+        desc = (rule.description or "").replace('"', '""')
+        action = rule.action.value if hasattr(rule.action, 'value') else rule.action
+        category = rule.category.value if hasattr(rule.category, 'value') else rule.category
+        status = rule.status.value if hasattr(rule.status, 'value') else rule.status
+        created_at = rule.created_at.isoformat() if rule.created_at else ""
+        
+        output.write(f'{rule.id},"{name}","{desc}",{rule.landing_zone},{rule.rule_collection_name},{rule.priority},{action},{category},{status},{rule.created_by},{created_at}\n')
     
     output.seek(0)
     return output.getvalue()
@@ -56,6 +54,6 @@ async def export_rules_csv(
         iter([csv_content]),
         media_type="text/csv",
         headers={
-            "Content-Disposition": f'attachment; filename="firewall_rules_{__import__("datetime").date.today()}.csv"'
+            "Content-Disposition": f'attachment; filename="firewall_rules_{date.today()}.csv"'
         },
     )

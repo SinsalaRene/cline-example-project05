@@ -148,7 +148,7 @@ class FirewallRuleResponse(FirewallRuleBase):
     submitted_for_approval_at: datetime | None = None
     tags: List[TagResponse] = Field(default_factory=list)
     approvers: List[UserResponse] = Field(default_factory=list)
-    approvals: List["ApprovalResponse"] = Field(default_factory=list)
+    approvals: List["ApprovalRecordResponse"] = Field(default_factory=list)
 
     model_config = {"from_attributes": True}
 
@@ -245,6 +245,23 @@ class RuleCollectionResponse(BaseModel):
     created_at: datetime | None = None
 
     model_config = {"from_attributes": True}
+
+
+class RuleFilterRequest(BaseModel):
+    """Filter parameters for firewall rule search."""
+    landing_zone: str | None = None
+    status: list[str] | None = None
+    action: list[str] | None = None
+    category: list[str] | None = None
+    workload: str | None = None
+    environment: str | None = None
+    search: str | None = None
+    priority_min: int | None = None
+    priority_max: int | None = None
+    page: int = 1
+    per_page: int = 50
+    sort_by: str = "updated_at"
+    sort_order: str = "desc"
 
 
 # ─── Search / Filter ─────────────────────────────────────────────────────────

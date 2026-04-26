@@ -6,8 +6,34 @@ from enum import Enum
 
 class Environment(str, Enum):
     DEVELOPMENT = "development"
-    STAGING = "staging" 
+    STAGING = "staging"
     PRODUCTION = "production"
+
+
+# ─── Domain Enums ──────────────────────────────────────────────────────────────
+
+
+class RuleAction(str, Enum):
+    ALLOW = "allow"
+    DENY = "deny"
+    ALERT = "alert"
+
+
+class RuleStatus(str, Enum):
+    DRAFT = "draft"
+    PENDING_APPROVAL = "pending_approval"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    ACTIVE = "active"
+    DEPRECATED = "deprecated"
+    ARCHIVED = "archived"
+
+
+class ApprovalStatus(str, Enum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    CANCELLED = "cancelled"
 
 
 class ApprovalLevel(str, Enum):
@@ -16,12 +42,42 @@ class ApprovalLevel(str, Enum):
     SECURITY_AND_WORKLOAD = "security_and_workload"
 
 
+class ResourceCategory(str, Enum):
+    NETWORK = "network"
+    SECURITY = "security"
+    APPLICATION = "application"
+    DATA = "data"
+
+
+class WorkloadType(str, Enum):
+    WEB = "web"
+    API = "api"
+    DATABASE = "database"
+    STORAGE = "storage"
+    COMPUTE = "compute"
+    AI = "ai"
+    DATA_PROCESSING = "data_processing"
+
+
+class AuditAction(str, Enum):
+    CREATE = "create"
+    UPDATE = "update"
+    DELETE = "delete"
+    APPROVE = "approve"
+    REJECT = "reject"
+    SUBMIT = "submit"
+    VIEW = "view"
+
+
 class Role(str, Enum):
     ADMIN = "admin"
     SECURITY_STAKEHOLDER = "security_stakeholder"
     WORKLOAD_STAKEHOLDER = "workload_stakeholder"
     REVIEWER = "reviewer"
     VIEWER = "viewer"
+
+
+# ─── Settings ──────────────────────────────────────────────────────────────────
 
 
 class Settings(BaseSettings):

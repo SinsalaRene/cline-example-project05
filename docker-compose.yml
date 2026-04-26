@@ -28,6 +28,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      migration_runner:
+        condition: service_completed_successfully
     volumes:
       - backend_data:/app/data
     networks:
@@ -61,7 +63,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=firewall_manager
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -99,6 +101,26 @@ services:
     networks:
       - fw-portal-net
     restart: unless-stopped
+
+  migration_runner:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fw-portal-migration
+    command: >
+      sh -c "
+        cd /app &&
+        alembic upgrade head &&
+        python scripts/seed_data.py
+      "
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/firewall_manager
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - fw-portal-net
+    restart: "no"
 
   # Optional: pgAdmin for database management
   pgadmin:

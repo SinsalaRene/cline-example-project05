@@ -58,10 +58,10 @@ async def lifespan(app: FastAPI):
     from app.database import AsyncSessionLocal
 
     async with AsyncSessionLocal() as db:
-        admin = await db.execute(
+        admin_result = await db.execute(
             select(User).where(User.oidc_sub == "dev-sub-001")
         )
-        if not await admin.scalar_one_or_none():
+        if not admin_result.scalar_one_or_none():
             admin_user = User(
                 oidc_sub="dev-sub-001",
                 email="admin@example.com",
@@ -74,10 +74,10 @@ async def lifespan(app: FastAPI):
             await db.commit()
             logger.info("Seeded admin user")
 
-        security_user = await db.execute(
+        security_user_result = await db.execute(
             select(User).where(User.oidc_sub == "security-sub-001")
         )
-        if not await security_user.scalar_one_or_none():
+        if not security_user_result.scalar_one_or_none():
             sec_user = User(
                 oidc_sub="security-sub-001",
                 email="security@example.com",
@@ -90,10 +90,10 @@ async def lifespan(app: FastAPI):
             await db.commit()
             logger.info("Seeded security user")
 
-        workload_user = await db.execute(
+        workload_user_result = await db.execute(
             select(User).where(User.oidc_sub == "workload-sub-001")
         )
-        if not await workload_user.scalar_one_or_none():
+        if not workload_user_result.scalar_one_or_none():
             wl_user = User(
                 oidc_sub="workload-sub-001",
                 email="workload@example.com",
@@ -166,18 +166,8 @@ async def add_security_headers(request: Request, call):
 
 
 # ─── Request ID Middleware ──────────────────────────────────────────────────────
-
-@app.middleware("http")
-async def add_request_id(request: Request, call):
-    """Ensure request ID is propagated through the request."""
-    request_id = request.headers.get(settings.REQUEST_ID_HEADER)
-    if not request_id:
-        request_id = str(uuid.uuid4())
-        request.headers[settings.REQUEST_ID_HEADER] = request_id
-    
-    response = await call(request)
-    response.headers[settings.REQUEST_ID_HEADER] = request_id
-    return response
+# NOTE: RequestIDMiddleware from middleware/ already handles request ID injection.
+# This endpoint middleware is no longer needed.
 
 
 # ─── Health Check ───────────────────────────────────────────────────────────────
