@@ -249,17 +249,40 @@ class RuleCollectionResponse(BaseModel):
 
 # ─── Search / Filter ─────────────────────────────────────────────────────────
 
-class RuleFilterRequest(BaseModel):
-    landing_zone: str | None = None
-    status: List[str] | None = None
-    action: List[str] | None = None
-    category: List[str] | None = None
-    workload: str | None = None
-    environment: str | None = None
-    search: str | None = None
-    priority_min: int | None = None
-    priority_max: int | None = None
-    page: int = 1
-    per_page: int = 50
-    sort_by: str = "updated_at"
-    sort_order: str = "desc"
+# ─── Pagination ───────────────────────────────────────────────────────────────
+
+class PaginationMetadata(BaseModel):
+    """Pagination metadata for list responses."""
+    total: int
+    page: int
+    per_page: int
+    total_pages: int
+
+
+class PaginatedResponse(BaseModel):
+    """Base paginated response."""
+    total: int = Field(..., description="Total number of items")
+    page: int = Field(..., description="Current page number")
+    per_page: int = Field(..., description="Items per page")
+    items: List[Any] = Field(..., description="List of items")
+
+
+# ─── Statistics ───────────────────────────────────────────────────────────────
+
+class StatisticsResponse(BaseModel):
+    """Dashboard statistics."""
+    total_rules: int = 0
+    by_status: Dict[str, int] = Field(default_factory=dict)
+    by_action: Dict[str, int] = Field(default_factory=dict)
+    by_landing_zone: Dict[str, int] = Field(default_factory=dict)
+    by_category: Dict[str, int] = Field(default_factory=dict)
+
+
+class HealthCheckResponse(BaseModel):
+    """Health check response with dependency status."""
+    status: str
+    version: str
+    environment: str
+    database: str = "unknown"
+    cache: str = "unknown"
+    timestamp: str

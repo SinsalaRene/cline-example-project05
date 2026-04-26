@@ -85,6 +85,21 @@ services:
       - fw-portal-net
     restart: unless-stopped
 
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fw-portal-celery
+    command: celery -A app.tasks.base.celery_app worker --loglevel=info
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+      - backend
+    networks:
+      - fw-portal-net
+    restart: unless-stopped
+
   # Optional: pgAdmin for database management
   pgadmin:
     image: dpage/pgadmin4:latest

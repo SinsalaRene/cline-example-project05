@@ -13,13 +13,17 @@ from slowapi.middleware import SlowAPIMiddleware
 
 from app.config import settings
 from app.database import engine, init_db, get_db
-from app.routers import auth, firewalls, approvals
+from app.routers import auth, firewalls, approvals, stats, export
+from app.middleware.request_id import RequestIDMiddleware
+from app.middleware.error_handler import (
+    custom_http_exception_handler,
+    validation_exception_handler,
+    general_exception_handler,
+)
+from app.logging_config import setup_logging
 
 # Configure structured logging
-logging.basicConfig(
-    level=logging.INFO if not settings.DEBUG else logging.DEBUG,
-    format='%(asctime)s %(levelname)s %(name)s %(message)s'
-)
+setup_logging()
 logger = logging.getLogger(__name__)
 
 
@@ -117,6 +121,9 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# Request ID middleware
+app.add_middleware(RequestIDMiddleware)
+
 # Rate limiter
 limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
@@ -186,8 +193,16 @@ async def health_check():
     }
 
 
+# ─── Exception Handlers ────────────────────────────────────────────────────────
+
+app.add_exception_handler(HTTPException, custom_http_exception_handler)
+app.add_exception_handler(Exception, general_exception_handler)
+
+
 # ─── Register Routers ──────────────────────────────────────────────────────────
 
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(firewalls.router, prefix="/api/v1")
 app.include_router(approvals.router, prefix="/api/v1")
+app.include_router(stats.router, prefix="/api/v1")
+app.include_router(export.router, prefix="/api/v1")
