@@ -1,10 +1,13 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { AuthService } from '../app/shared/auth.service';
+import { NgIf, NgStyle } from '@angular/common';
+import { AuthService, User } from './core/services/auth.service';
 
 @Component({
     selector: 'app-root',
+    standalone: true,
+    imports: [RouterOutlet, RouterLink, RouterLinkActive, NgIf],
     template: `
         <div class="app-layout">
             <nav class="sidebar" *ngIf="isLoggedIn">
@@ -13,8 +16,8 @@ import { AuthService } from '../app/shared/auth.service';
                     <span class="brand-sub">Portal</span>
                 </div>
                 <ul class="nav-links">
+                    <li><a routerLink="/dashboard" routerLinkActive="active">Dashboard</a></li>
                     <li><a routerLink="/rules" routerLinkActive="active">Rules</a></li>
-                    <li><a routerLink="/approvals" routerLinkActive="active">Approvals</a></li>
                 </ul>
                 <div class="sidebar-footer">
                     <div class="user-info">
@@ -106,11 +109,14 @@ export class AppComponent implements OnInit {
     role = 'viewer';
     private authService = inject(AuthService);
 
+    user$ = this.authService.user$;
+
     ngOnInit(): void {
-        this.authService.currentUser$.subscribe(user => {
+        this.user$.subscribe((user: User | null) => {
             if (user) {
                 this.userName = user.display_name;
                 this.role = user.role;
+                this.isLoggedIn = true;
             } else {
                 this.isLoggedIn = false;
             }

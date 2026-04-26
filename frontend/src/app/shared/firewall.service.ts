@@ -53,4 +53,12 @@ export class FirewallService {
     getStatistics(): Observable<Statistics> {
         return this.api.get<Statistics>('/statistics');
     }
+
+    deleteRule(id: number): Observable<{ message: string }> {
+        return this.api.delete<{ message: string }>(`/rules/${id}`);
+    }
+
+    getDashboardStats(): Observable<Statistics> {
+        return this.api.get<Statistics>('/stats/dashboard');
+    }
 }

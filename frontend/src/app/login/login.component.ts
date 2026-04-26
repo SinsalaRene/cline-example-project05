@@ -1,9 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../shared/auth.service';
+import { FormsModule } from '@angular/forms';
+import { NgIf } from '@angular/common';
+import { AuthService } from '../core/services/auth.service';
 
 @Component({
     selector: 'app-login',
+    standalone: true,
+    imports: [FormsModule, NgIf],
     template: `
         <div class="login-container">
             <div class="login-card">
@@ -18,7 +22,9 @@ import { AuthService } from '../shared/auth.service';
                     <input type="password" [(ngModel)]="password" placeholder="Password (dev: any)" />
                 </div>
                 <div *ngIf="error" style="color:red; margin-bottom:16px;">{{ error }}</div>
-                <button (click)="onLogin()" class="btn-login">Sign in</button>
+                <button (click)="onLogin()" class="btn-login" [disabled]="loading">
+                    {{ loading ? 'Signing in...' : 'Sign in' }}
+                </button>
                 <p style="margin-top:16px; font-size:12px; color:#888; text-align:center;">
                     Demo: admin@example.com / any password
                 </p>
@@ -79,29 +85,29 @@ import { AuthService } from '../shared/auth.service';
             margin-top: 8px;
         }
         .btn-login:hover { background: #0056b3; }
+        .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
     `])
 export class LoginComponent {
     email = 'admin@example.com';
     password = '';
     error = '';
+    loading = false;
 
     private authService = inject(AuthService);
     private router = inject(Router);
 
     onLogin(): void {
-        // In production, this would redirect to Azure login
-        // For dev, create mock user
-        const mockUser = {
-            id: 1,
-            email: this.email,
-            display_name: this.email.split('@')[0],
-            role: this.email.includes('admin') ? 'admin' :
-                this.email.includes('security') ? 'security_stakeholder' :
-                    this.email.includes('workload') ? 'workload_stakeholder' : 'viewer',
-            workload: 'default',
-            is_active: true
-        };
-        this.authService.login('mock-token-' + Date.now(), mockUser);
-        this.router.navigate(['/rules']);
+        this.loading = true;
+        this.error = '';
+
+        this.authService.login(this.email, this.password).subscribe({
+            next: () => {
+                this.router.navigate(['/dashboard']);
+            },
+            error: (err: Error) => {
+                this.error = 'Login failed. Please check your credentials.';
+                this.loading = false;
+            }
+        });
     }
 }

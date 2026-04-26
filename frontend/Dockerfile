@@ -1,24 +1,14 @@
 # Build stage
-FROM node:18-alpine AS build
-
+FROM node:20-alpine AS build
 WORKDIR /app
-
-COPY package.json angular.json tsconfig.json ./
-RUN npm install
-
-COPY src/ ./src/
-COPY dist/ ./dist/
-
+COPY package*.json ./
+RUN npm ci
+COPY . .
 RUN npm run build -- --configuration production
 
 # Production stage
 FROM nginx:alpine
-
-COPY --from=build /app/dist/ /usr/share/nginx/html/
-
-# Copy nginx config if needed
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
+COPY --from=build /app/dist /usr/share/nginx/html
 EXPOSE 80
-
 CMD ["nginx", "-g", "daemon off;"]

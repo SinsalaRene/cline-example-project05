@@ -1,29 +1,49 @@
-import { NgModule } from '@angular/core';
+import { NgModule, inject } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideToastr } from 'ngx-toastr';
+import { provideTranslate, TranslateLoader } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
+import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { LoginComponent } from './login/login.component';
-import { RulesComponent } from './rules/rules.component';
-import { RuleDetailComponent } from './rules/rule-detail/rule-detail.component';
-import { ApprovalsComponent } from './approvals/approvals.component';
+
+// HTTP Interceptors
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { RequestInterceptor } from './core/interceptors/request.interceptor';
+import { ErrorInterceptor } from './core/interceptors/error.interceptor';
+
+export function TranslateLoaderFactory(http: any) {
+    return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+}
 
 @NgModule({
     declarations: [
-        AppComponent,
-        LoginComponent,
-        RulesComponent,
-        RuleDetailComponent,
-        ApprovalsComponent
+        AppComponent
     ],
     imports: [
         BrowserModule,
-        FormsModule,
-        ReactiveFormsModule,
-        HttpClientModule
+        AppRoutingModule
     ],
-    providers: [],
+    providers: [
+        provideAnimations(),
+        provideHttpClient(withInterceptorsFromDi()),
+        provideToastr({
+            positionClass: 'toast-top-right',
+            timeOut: 5000,
+            progressBar: true,
+        }),
+        provideTranslate({
+            loader: {
+                provide: TranslateLoader,
+                useFactory: TranslateLoaderFactory,
+                deps: []
+            }
+        }),
+        { provide: HTTP_INTERCEPTORS, useClass: RequestInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule { }
