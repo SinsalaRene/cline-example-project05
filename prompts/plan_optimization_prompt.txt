@@ -1,0 +1,5 @@
+Check out this project and plan out an extensive plan for multiple improvements over long sessions of development in agentic worklows. Split them up so it can be run sequentially while staying in a context windows not exeeding 130k. 
+All changes/features need to have testing and a documentation as well as adjustments to global documentation when needed. 
+You can split the test creating in its own tasks to save context size when it makes sense. 
+All tasks should be in a prompt format so they can be easily pasted. 
+If you need guidance in what direction you need to develop this application you can ask directly.
