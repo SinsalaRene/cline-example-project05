@@ -1,0 +1,34 @@
+# Helm values for firewall-manager
+replicaCount: 2
+
+image:
+  repository: firewall-manager
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  hosts:
+    - firewall-manager.example.com
+  tls:
+    - secretName: firewall-tls
+      hosts:
+        - firewall-manager.example.com
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80

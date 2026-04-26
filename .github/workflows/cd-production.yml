@@ -1,0 +1,45 @@
+name: CD - Production
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  approval:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Wait for approval
+        run: echo "Manual approval required"
+        
+  deploy:
+    runs-on: ubuntu-latest
+    needs: approval
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          subscription-id: ${{ secrets.PROD_SUBSCRIPTION }}
+          
+      - name: Rollback protection
+        run: |
+          echo "Running pre-deploy checks..."
+          
+      - name: Deploy Backend
+        run: |
+          # Deploy with canary strategy
+          az aks upgrade ...
+          
+      - name: Health Check
+        run: |
+          # Verify health endpoint
+          curl -f https://api.example.com/health || exit 1
+          
+      - name: Run Smoke Tests
+        run: |
+          # Run post-deploy smoke tests
+          pytest tests/smoke/

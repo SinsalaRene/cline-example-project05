@@ -1,0 +1,38 @@
+name: CD - Staging
+
+on:
+  push:
+    branches: [develop]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          subscription-id: ${{ secrets.STAGING_SUBSCRIPTION }}
+          
+      - name: Build & Push Backend
+        run: |
+          az acr login --name ${{ secrets.ACR_NAME }}
+          docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/backend:${{ github.sha }} -f backend/Dockerfile .
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/backend:${{ github.sha }}
+          
+      - name: Build & Push Frontend
+        run: |
+          docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/frontend:${{ github.sha }} -f frontend/Dockerfile .
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/frontend:${{ github.sha }}
+          
+      - name: Deploy to AKS
+        uses: azure/k8s-deploy@v4
+        with:
+          namespace: staging
+          images: ${{ secrets.ACR_NAME }}.azurecr.io/backend:${{ github.sha }}
+          secrets: |
+            DB_PASSWORD=${{ secrets.STAGING_DB_PASSWORD }}
+            JWT_SECRET=${{ secrets.STAGING_JWT_SECRET }}
