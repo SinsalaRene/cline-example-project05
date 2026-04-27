@@ -2,6 +2,31 @@
 
 A comprehensive platform for managing Azure firewall rules with a web-based approval workflow.
 
+## Local AI Config
+
+### Model 
+
+[Qwen3.6 huggingface.co](https://huggingface.co/unsloth/Qwen3.6-35B-A3B-GGUF/blob/main/Qwen3.6-35B-A3B-UD-IQ3_S.gguf)
+
+### llama.cpp
+
+./build/bin/llama-server \
+  -m /mnt/c/LLM-MODELS/Qwen3.6-35B-A3B-UD-IQ3_S.gguf \
+  --alias "qwen3.6-35b" \
+  -c 163840 \
+  -ngl 999 \
+  --n-cpu-moe 2 \
+  --flash-attn on \
+  --cache-type-k q4_0 \
+  --cache-type-v q4_0 \
+  -b 1024 \
+  -ub 1024 \
+  -t 24 \
+  --jinja \
+  --no-mmap \
+  --host 0.0.0.0 \
+  --port 8080
+
 ## Quick Start
 
 ```bash
